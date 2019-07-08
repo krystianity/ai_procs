@@ -1,12 +1,16 @@
 # ai_procs
 
+Automated I/O vector preparation for neuronal networks.
+
 ## Install
 
-`pip install git@github.com:krystianity/ai_procs.git`
+`pip install https://github.com/krystianity/ai_procs/archive/master.zip`
 
 ## Use
 
-TBD
+```python
+from ai_procs import procs
+```
 
 ## Develop locally
 

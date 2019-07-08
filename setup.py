@@ -4,7 +4,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 setup(
-    name='AI Procs',
+    name='ai_procs',
     version='0.1.0',
     description='Automated I/O-V preparation for NN',
     author='Christian Fröhlingsdorf',
