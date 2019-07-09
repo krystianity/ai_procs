@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+import numpy as np
 from enum import Enum
 
 __version__ = "0.1.0"
@@ -68,6 +69,18 @@ def _validate_options(options):
         raise ValueError("Missing dep_var key in options dict")
 
     return
+
+
+def split_df(df, valid_frac=0.2, test_frac=0.0):
+    df_len = len(df)
+    random_idx = np.random.permutation(df_len)
+    df = df.iloc[random_idx]
+    valid_cut = int(valid_frac * df_len)
+    test_cut = valid_cut + int(test_frac * df_len)
+    valid_df = df.iloc[:valid_cut]
+    test_df = df.iloc[valid_cut:test_cut]
+    train_df = df.iloc[test_cut:]
+    return train_df, valid_df, test_df
 
 
 def create_options(procs, cat_names, dep_var):
