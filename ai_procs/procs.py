@@ -8,6 +8,7 @@ __version__ = "0.1.0"
 class COL_TYPES(Enum):
     NORMALIZED = "NORMALIZED"
     CATEGORIZED = "CATEGORIZED"
+    DEPVAR = "DEPVAR"
 
 
 def _create_metadata(options):
@@ -24,8 +25,10 @@ def _analyse_fill_missing(df, options, metadata):
 
 def _analyse_standardization(df, options, metadata):
     columns = list(df.columns.values)
+    ignore_list = options["cat_names"].copy()
+    ignore_list.append(options["dep_var"])
     for column in columns:
-        if column not in options["cat_names"]:
+        if column not in ignore_list:
             mean = df[column].mean()
             std = df[column].std()
             metadata["columns"][column] = {
@@ -37,7 +40,34 @@ def _analyse_standardization(df, options, metadata):
 
 def _analyse_categorization(df, options, metadata):
     for cat in options["cat_names"]:
-        metadata["columns"][cat] = {"type": COL_TYPES.CATEGORIZED.value}
+
+        u_values = df[cat].unique().tolist()
+        values = {}
+        for i, val in enumerate(u_values):
+            values[i] = val
+
+        metadata["columns"][cat] = {
+            "type": COL_TYPES.CATEGORIZED.value,
+            "values": values,
+        }
+
+
+def _validate_options(options):
+
+    if "procs" not in options:
+        raise ValueError("Missing procs key in options dict")
+
+    if "cat_names" not in options:
+        raise ValueError("Missing cat_names key in options")
+
+    if "dep_var" not in options:
+        raise ValueError("Missing dep_var key in options dict")
+
+    return
+
+
+def create_options(procs, cat_names, dep_var):
+    return {"procs": procs, "cat_names": cat_names, "dep_var": dep_var}
 
 
 def store_metadata(metadata, filepath):
@@ -46,9 +76,18 @@ def store_metadata(metadata, filepath):
     return
 
 
+def load_metadata(filepath):
+    metadata = {}
+    with open(filepath) as json_file:
+        metadata = json.load(json_file)
+    return metadata
+
+
 def analyse_df(df, options):
 
+    _validate_options(options)
     metadata = _create_metadata(options)
+
     for proc in options["procs"]:
         if proc == "FillMissing":
             _analyse_fill_missing(df, options, metadata)
@@ -57,7 +96,9 @@ def analyse_df(df, options):
         elif proc == "Categorize":
             _analyse_categorization(df, options, metadata)
         else:
-            raise ValueError("Unsupported proc " + proc)
+            raise ValueError("Unsupported proc type in options " + proc)
+
+    metadata["columns"][options["dep_var"]] = {"type": COL_TYPES.DEPVAR.value}
 
     return metadata
 
@@ -72,5 +113,9 @@ def prepare_df(df, metadata):
         info = metadata["columns"][column]
         if info["type"] == COL_TYPES.NORMALIZED.value:
             df[column] = _standardize_vec(df[column], info["mean"], info["std"])
+
+        if info["type"] == COL_TYPES.CATEGORIZED.value:
+            # TODO: pivot
+            print("pivot")
 
     return df
