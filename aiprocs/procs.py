@@ -116,9 +116,9 @@ def prepare_df(df, metadata):
 
         info = metadata["columns"][column]
         if info["type"] == COL_TYPES.NORMALIZED.value:
-            df[column] = _standardize_vec(df[column], info["mean"], info["std"])
+            df.loc[:, column] = _standardize_vec(df[column], info["mean"], info["std"])
 
         if info["type"] == COL_TYPES.CATEGORIZED.value:
-            df[column] = _map_vec(df[column], info["values"])
+            df.loc[:, column] = _map_vec(df[column], info["values"])
 
     return df
