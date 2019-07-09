@@ -19,6 +19,10 @@ def _standardize_vec(vec, mean, std):
     return vec.sub(mean).div(std)
 
 
+def _map_vec(vec, hashmap):
+    return vec.map(hashmap)
+
+
 def _analyse_fill_missing(df, options, metadata):
     return
 
@@ -44,7 +48,7 @@ def _analyse_categorization(df, options, metadata):
         u_values = df[cat].unique().tolist()
         values = {}
         for i, val in enumerate(u_values):
-            values[i] = val
+            values[val] = i
 
         metadata["columns"][cat] = {
             "type": COL_TYPES.CATEGORIZED.value,
@@ -115,7 +119,6 @@ def prepare_df(df, metadata):
             df[column] = _standardize_vec(df[column], info["mean"], info["std"])
 
         if info["type"] == COL_TYPES.CATEGORIZED.value:
-            # TODO: pivot
-            print("pivot")
+            df[column] = _map_vec(df[column], info["values"])
 
     return df
