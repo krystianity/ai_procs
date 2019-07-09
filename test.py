@@ -1,5 +1,5 @@
 import pandas as pd
-from ai_procs import procs
+from aiprocs import procs
 
 pd.set_option("display.max_rows", 2)
 
