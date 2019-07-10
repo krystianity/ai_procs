@@ -1,6 +1,6 @@
 # ai_procs
 
-Automated I/O vector preparation for neuronal networks.
+Automated I/O vector preparation for neuronal networks across multiple platforms.
 
 ## Install
 
@@ -9,8 +9,28 @@ Automated I/O vector preparation for neuronal networks.
 ## Use
 
 ```python
-from ai_procs import procs
+from ai_procs import aip
+
+options = aip.create_options(
+    ["FillMissing", "Normalize", "Categorify"],
+    ["age", "thal"],
+    "target",
+    aip.MODEL_TYPES.PYTORCH.value,
+)
+
+# load dataset into df
+metadata = aip.analyse_df(df, options)
+df = aip.prepare_df(df, metadata)
+# train model on df
+aip.store_metadata(metadata, "./metadata.json")
+# export model
 ```
+
+## Using on other platforms
+
+Importing models and metadata for other platforms.
+
+* with C++ ` https://github.com/krystianity/ai_procs_native`
 
 ## Develop locally
 
