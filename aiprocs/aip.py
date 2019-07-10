@@ -41,10 +41,10 @@ def _analyse_fill_missing(df, options, metadata):
     for column in columns:
         if column not in ignore_list:
             strategy = options["fill_strategy"]
-            if strategy == FILL_TYPES.MEDIAN:
+            if strategy == FILL_TYPES.MEDIAN.value:
                 median = df[column].median()
                 metadata["columns"][column] = {"fill_type": strategy, "median": median}
-            elif strategy == FILL_TYPES.CONST:
+            elif strategy == FILL_TYPES.CONST.value:
                 metadata["columns"][column] = {
                     "fill_type": strategy,
                     "fill_val": options["filler"],
